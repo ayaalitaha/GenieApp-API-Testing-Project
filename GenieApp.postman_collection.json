@@ -1,0 +1,643 @@
+{
+  "info": {
+    "_postman_id": "aa466059-27d3-493f-8f5a-6e564d9e17ac",
+    "name": "GenieApp",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37887721"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  " pm.test(\"Status code is 200\", function () {\r",
+                  "        pm.response.to.have.status(200);\r",
+                  "    });\r",
+                  " \r",
+                  " const responseData = pm.response.json();\r",
+                  " pm.test(\"verify login success status\", function(){\r",
+                  "    pm.expect(responseData.message).to.eql(\"success\");\r",
+                  "    pm.expect(responseData.error).to.eql(false);\r",
+                  " });\r",
+                  "\r",
+                  " pm.test(\"update access token in environment\", function(){\r",
+                  "   if (responseData.results && responseData.results.token) {\r",
+                  "         pm.environment.set(\"token\", responseData.results.token);\r",
+                  "         console.log(\"Login Token updated successfully\");\r",
+                  "    } else {\r",
+                  "         pm.expect.fail(\"Token missing from login response\");\r",
+                  "    }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"{{email}}\",\r\n    \"password\": \"{{password}}\",\r\n    \"device_token\": null\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/auth/signin",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sign Up",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test(\"Response time is less than 2000ms\", function () {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});\r",
+                  "const responseData = pm.response.json();\r",
+                  "pm.test(\"verify sign up response structure'\", function () {\r",
+                  "    pm.expect(responseData.message).to.eql(\"success\");\r",
+                  "    pm.expect(responseData.error).to.eql(false);\r",
+                  "    pm.expect(responseData.code).to.eql(200);\r",
+                  "    pm.expect(responseData.results).to.have.property(\"id\");\r",
+                  "});\r",
+                  "pm.test(\"save token and user info to environment\", function () {\r",
+                  "    if(responseData.results && responseData.results.token){\r",
+                  "        pm.environment.set(\"token\", responseData.results.token);\r",
+                  "        pm.environment.set(\"user_id\", responseData.results.id);\r",
+                  "        pm.environment.set(\"email\" , responseData.results.email);\r",
+                  "         pm.environment.set(\"phone_number\" , responseData.results.phone_number);\r",
+                  "        console.log(\"token and user_id have been saved successfully!\");\r",
+                  "    }\r",
+                  "    else{\r",
+                  "        pm.expect.fail(\"token not found in the response\");\r",
+                  "    }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"full_name\": \"leen\",\r\n    \"phone_number\": \"010{{$randomInt}}\",\r\n    \"email\": \"user{{$randomInt}}@gmail.com\",\r\n    \"city_id\": 1,\r\n    \"password\": \"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/auth/signup",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "const responseData = pm.response.json();\r",
+                  "pm.test(\"Verify profile response basic structure\", function () {\r",
+                  "    pm.expect(responseData.message).to.eql(\"success\");\r",
+                  "    pm.expect(responseData.error).to.be.false;\r",
+                  "    pm.expect(responseData.code).to.eql(200);\r",
+                  "});\r",
+                  "pm.test(\"Verify user profile data integrity\", function () {\r",
+                  "    const userData = responseData.results;\r",
+                  "    pm.expect(userData).to.be.an('object');\r",
+                  "    pm.expect(userData).to.have.property('id');\r",
+                  "    pm.expect(userData).to.have.property('email');\r",
+                  "    pm.expect(userData.email).to.include('@');\r",
+                  "    if (userData.id) {\r",
+                  "        pm.environment.set(\"current_user_id\", userData.id);\r",
+                  "    }\r",
+                  "    console.log(`Successfully verified profile for User ID: ${userData.id} `);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/users/profile",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ],
+              "query": [
+                {
+                  "key": "",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(202);\r",
+                  "});\r",
+                  "\r",
+                  "const responseData = pm.response.json();\r",
+                  "pm.test(\"verify update profile response status\", function () {\r",
+                  "    pm.expect(responseData.message).to.eql(\"Updated\");\r",
+                  "    pm.expect(responseData.error).to.eql(false);\r",
+                  "    pm.expect(responseData.code).to.eql(202);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify updated user profile data integrity\", function () {\r",
+                  "    const updatedUser = responseData.results;\r",
+                  "    pm.expect(updatedUser).to.be.an('object');\r",
+                  "    pm.expect(updatedUser).to.have.property('id');\r",
+                  "    pm.expect(updatedUser.full_name).to.eql(\"leen\");\r",
+                  "    pm.expect(updatedUser.photo_url).to.not.be.empty;\r",
+                  "    pm.expect(updatedUser.photo_url).to.include('/images/users/');\r",
+                  "    console.log(`Profile updated successfully for User: ${updatedUser.full_name} (ID: ${updatedUser.id}) `);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "full_name",
+                  "value": "leen",
+                  "type": "text"
+                },
+                {
+                  "key": "phone_number",
+                  "value": "{{phone_number}}",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "{{email}}",
+                  "type": "text"
+                },
+                {
+                  "key": "city_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "profile_image",
+                  "type": "file",
+                  "src": [
+                    "postman-cloud:///1efe25e4-210d-4fa0-b902-57e8edc63ed4",
+                    "uP8ZF0rhB/dc85a8b1206565dd11b222b5917ec2fe.jpg"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/users/profile",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "profile"
+              ]
+            },
+            "description": "This API endpoint allows users to update their profile information. The HTTP POST request should be made to [https://genie.aimtech.online/api/v1/users/profile](https://genie.aimtech.online/api/v1/users/profile). The request should include a form-data request body with the necessary parameters to update the user's profile.\n\n### Request Body\n\n- No specific parameters were provided for the form-data request body.\n    \n\n### Response\n\nThe response will contain the updated profile information for the user."
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offers",
+      "item": [
+        {
+          "name": "Best Offers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const responseData = pm.response.json();\r",
+                  "pm.test(\"verift response status\", function () {\r",
+                  "\r",
+                  "    pm.expect(responseData.message).to.eql(\"success\");\r",
+                  "    pm.expect(responseData.error).to.eql(false);\r",
+                  "    pm.expect(responseData.code).to.eql(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"verift pagination details\", function () {\r",
+                  "\r",
+                  "    pm.expect(responseData.results.page).to.eql(1);\r",
+                  "    pm.expect(responseData.results.limit).to.eql(10);\r",
+                  "    pm.expect(responseData.results.total).to.be.a('number');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify best offers list and data integrity\", function () {\r",
+                  "    const offersList = responseData.results.data;\r",
+                  "    pm.expect(offersList).to.be.an('array');\r",
+                  "    pm.expect(offersList.length).to.be.at.most(responseData.results.limit);\r",
+                  "    if (offersList.length > 0) {\r",
+                  "        const firstOffer = offersList[0];\r",
+                  "        pm.expect(firstOffer).to.have.property('id');\r",
+                  "        pm.expect(firstOffer).to.have.property('title');\r",
+                  "        pm.expect(firstOffer).to.have.property('original_price');\r",
+                  "        pm.expect(firstOffer).to.have.property('offer_price');\r",
+                  "        pm.expect(firstOffer).to.have.property('discount_value');\r",
+                  "        pm.expect(firstOffer.offer_price).to.be.a('number');\r",
+                  "        pm.expect(firstOffer.original_price).to.be.a('number');\r",
+                  "    }\r",
+                  "    console.log(`Verified ${offersList.length} best offers on this page`);\r",
+                  "});\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/offers/best-offers?limit={{limit}}&page={{page}}",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "offers",
+                "best-offers"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "{{limit}}"
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "All Offers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const responseData = pm.response.json();\r",
+                  "pm.test(\"Verify response basic structure\", function () {\r",
+                  "    pm.expect(responseData.message).to.eql(\"success\");\r",
+                  "    pm.expect(responseData.error).to.be.false;\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify pagination details\", function () {\r",
+                  "    pm.expect(responseData.results.page).to.eql(1);\r",
+                  "    pm.expect(responseData.results.limit).to.be.an('number');\r",
+                  "    pm.expect(responseData.results.total).to.be.an('number');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Verify offers list is valid and matches limit\", function () {\r",
+                  "    const offersList = responseData.results.data; \r",
+                  "    pm.expect(offersList).to.be.an('array');\r",
+                  "    pm.expect(offersList.length).to.be.at.most(responseData.results.limit);\r",
+                  "    if(offersList.length > 0) {\r",
+                  "        pm.expect(offersList[0]).to.have.property('id');\r",
+                  "        pm.expect(offersList[0]).to.have.property('title');\r",
+                  "        pm.expect(offersList[0]).to.have.property('offer_price');\r",
+                  "    }\r",
+                  "    console.log(`Successfully verified ${offersList.length} offers on this page.`);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/offers/all-offers?limit={{limit}}&page={{page}}",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "offers",
+                "all-offers"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "{{limit}}"
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Providers",
+      "item": [
+        {
+          "name": "Top Reviews Providers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "const responseData = pm.response.json();\r",
+                  "pm.test(\"Response message is 'success'\", function () {\r",
+                  "    pm.expect(responseData.message).to.eql(\"success\");\r",
+                  "    pm.expect(responseData.error).to.eql(false);\r",
+                  "    pm.expect(responseData.code).to.eql(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"verify top providers list and data integraty\" , function(){\r",
+                  "const providersList = responseData.results.data;\r",
+                  "    pm.expect(providersList).to.be.an('array');\r",
+                  "    pm.expect(providersList.length).to.be.at.most(responseData.results.limit);\r",
+                  "    if (providersList.length > 0) {\r",
+                  "        const firstProvider = providersList[0];\r",
+                  "        pm.expect(firstProvider).to.have.property('id');\r",
+                  "        pm.expect(firstProvider).to.have.property('name');\r",
+                  "        pm.expect(firstProvider).to.have.property('reviews_count');\r",
+                  "        pm.expect(firstProvider).to.have.property('reviews_rating_avg');\r",
+                  "        pm.expect(firstProvider).to.have.property('favorite_status');\r",
+                  "        pm.expect(firstProvider.reviews_rating_avg).to.be.a('number');\r",
+                  "    }\r",
+                  "    console.log(`Successfully verified ${providersList.length} top providers.`);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{Server_URL}}/api/v1/providers/top-reviews-providers?limit={{limit}}&page={{page}}",
+              "host": [
+                "{{Server_URL}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "providers",
+                "top-reviews-providers"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "{{limit}}"
+                },
+                {
+                  "key": "page",
+                  "value": "{{page}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{token}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

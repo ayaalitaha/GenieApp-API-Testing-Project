@@ -1,0 +1,12 @@
+{
+    "Content-Type": "application/json",
+    "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjY1OCwiaWF0IjoxNzgwMTQ2ODIxLCJleHAiOjE3ODI3Mzg4MjF9.ltjBbKVVRikgxoeNqeqvkihNm-BOVbBjhC62oppkzYA",
+    "User-Agent": "PostmanRuntime/7.39.1",
+    "Accept": "*/*",
+    "Cache-Control": "no-cache",
+    "Postman-Token": "bceb130c-5ab7-4eb3-9a79-ed1c6fbd8bb5",
+    "Host": "genie.aimtech.online",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Connection": "keep-alive",
+    "Content-Length": "141"
+}

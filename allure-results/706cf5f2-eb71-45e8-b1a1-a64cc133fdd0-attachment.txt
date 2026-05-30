@@ -1,0 +1,7 @@
+{
+    "full_name": "leen",
+    "phone_number": "010560",
+    "email": "user275@gmail.com",
+    "city_id": 1,
+    "password": "123456"
+}

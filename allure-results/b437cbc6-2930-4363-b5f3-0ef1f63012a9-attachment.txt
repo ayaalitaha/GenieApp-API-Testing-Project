@@ -1,0 +1,5 @@
+{
+    "username": "user70@gmail.com",
+    "password": "123456",
+    "device_token": null
+}

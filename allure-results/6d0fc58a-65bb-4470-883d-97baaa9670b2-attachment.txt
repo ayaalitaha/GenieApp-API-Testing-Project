@@ -1,0 +1,1 @@
+level: log, messages: Verified 10 best offers on this page
